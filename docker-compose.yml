@@ -1,0 +1,40 @@
+version: '3.9'
+networks:
+  basic:
+services:
+  front:
+    # build:
+    #   context: ./
+    #   dockerfile: Dockerfile
+    #   target: front
+    container_name: ecwms_front
+    image: ecwms/ecwms:front
+    restart: always
+    privileged: true
+    ports:
+      - '8080:8080'
+    depends_on:
+      - backend
+    volumes:
+      - ./templates:/ECWMS/templates:rw
+      - ./web_start.sh:/ECWMS/templates/web_start.sh
+    networks:
+      - basic
+  backend:
+    # build:
+    #   context: ./
+    #   dockerfile: Dockerfile
+    #   target: backend
+    container_name: ecwms_backend
+    image: ecwms/ecwms:backend
+    restart: always
+    privileged: true
+    volumes:
+      - ./:/ECWMS/:rw
+      - ./supervisord.conf:/etc/supervisor/supervisord.conf
+    ports:
+      - '8008:8008'
+    environment:
+      PYTHONUNBUFFERED: 1
+    networks:
+      - basic
